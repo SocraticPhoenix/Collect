@@ -27,12 +27,14 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.RandomAccess;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -134,9 +136,7 @@ public class Items {
      */
     public static <T, C extends Collection<T>> C buildCollection(Supplier<C> collectionConstructor, T... vals) {
         C result = collectionConstructor.get();
-        for (T val : vals) {
-            result.add(val);
-        }
+        Collections.addAll(result, vals);
         return result;
     }
 
@@ -524,15 +524,19 @@ public class Items {
      * @return a negative integer if {@code a < b}, a positive integer if {@code a > b}, or zero if {@code a = b}
      */
     public static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {
-        if (a == b || a == null || b == null) {
-            return a == b ? 0 : a == null ? -1 : 1;
+        if(a instanceof RandomAccess && b instanceof RandomAccess) {
+            if (a == b || a == null || b == null) {
+                return a == b ? 0 : a == null ? -1 : 1;
+            }
+            int res = 0;
+            for (int i = 0; i < Math.min(a.size(), b.size()); i++) {
+                res += comparator.compare(a.get(i), b.get(i));
+            }
+            res += a.size() - b.size();
+            return res;
+        } else {
+            return Items.compare((Collection<T>) a, b, comparator);
         }
-        int res = 0;
-        for (int i = 0; i < Math.min(a.size(), b.size()); i++) {
-            res += comparator.compare(a.get(i), b.get(i));
-        }
-        res += a.size() - b.size();
-        return res;
     }
 
     /**
