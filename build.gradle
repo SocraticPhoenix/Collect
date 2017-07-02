@@ -37,6 +37,8 @@ repositories {
 }
 
 dependencies {
+    library "com.github.PlutoPowered:Mirror:master-SNAPSHOT"
+    
     library fileTree(dir: 'libs', include: "*.jar")
 }
 //End Repositories and Dependencies
