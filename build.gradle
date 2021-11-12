@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    library "com.github.SocraticPhoenix:Mirror:master-SNAPSHOT"
+
 }
 //End Repositories and Dependencies
 
